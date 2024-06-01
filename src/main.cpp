@@ -16,10 +16,21 @@ enum shapetype {
     RECTANGLE
 };
 
+struct boundings{
+    float x;
+    float y;
+    float rightmostx;
+    float rightmosty;
+};
+
 struct shapeinfo {
     shapetype type;
-    float posx;
-    float posy;
+    float startposx;
+    float startposy;
+    float endposx = 0;
+    float endposy = 0;
+    boundings bound;
+
 };
 
 std::vector<shapeinfo> shapes;
@@ -48,9 +59,14 @@ void checkclickanddraw(const sf::Vector2i& mouse_position) {
     if (firstsquarecheck(mouse_position) && firstcheck)
     {
         shapeinfo temp;
-        temp.type = RECTANGLE;
-        temp.posx = 50;
-        temp.posy = 130;
+        temp.type = CROSS;
+        temp.startposx = 35;
+        temp.startposy = 85;
+        temp.endposx = 210;
+        temp.endposy = 260;
+        temp.bound = {
+            25, 75, 225,275
+        };
         shapes.push_back(temp);
         firstcheck = false;
     }
@@ -156,7 +172,7 @@ int main()
             }
         }
 
-        window.clear();
+        window.clear(sf::Color(25,25,25,255));
         if(welcomescreen) {
             text.setString(L"TicTacToe");
             text2.setString("Press S to play");
@@ -185,12 +201,22 @@ int main()
             testfunction(window);
             checkclickanddraw(sf::Mouse::getPosition(window));
             for(auto& e : shapes) {
-                if (e.type == RECTANGLE)
-                {
-                    sf::RectangleShape shape(sf::Vector2f(100,100));
-                    shape.setPosition(e.posx,e.posy);
-                    window.draw(shape);
-                    
+                
+                if(e.type == CROSS) {
+                    sf::VertexArray line(sf::Lines, 4);
+
+                    line[0].position = sf::Vector2f(e.startposx, e.startposy);  // Starting point
+                    line[0].color = sf::Color::Green;
+
+                    line[1].position = sf::Vector2f(e.endposx, e.endposy);  // Ending point
+                    line[1].color = sf::Color::Green;
+
+                    line[2].position = sf::Vector2f(e.startposx + 200 - 25, e.startposy );  // Starting point
+                    line[2].color = sf::Color::Green;
+
+                    line[3].position = sf::Vector2f( e.startposx , e.endposy);  // Ending point
+                    line[3].color = sf::Color::Green;
+                    window.draw(line);
                 }
                 
             }
