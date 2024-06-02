@@ -1,27 +1,34 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/System/Vector2.hpp>
-#include <Windows.h>
 #include "checksquares.cpp"
+#include <SFML/Window/WindowStyle.hpp>
 #include <vector>
 #define WINDOW_WIDTH 650
 
 
 #define WINDOW_HEIGHT 700
-
+bool cross = true;
 enum shapetype {
     CIRCLE,
     CROSS,
     RECTANGLE
 };
 
-struct boundings{
-    float x;
-    float y;
-    float rightmostx;
-    float rightmosty;
+enum winnertags {
+    x,
+    circle,
+    draw
 };
+
+// struct boundings{
+//     float x;
+//     float y;
+//     float rightmostx;
+//     float rightmosty;
+// };
 
 struct shapeinfo {
     shapetype type;
@@ -29,12 +36,11 @@ struct shapeinfo {
     float startposy;
     float endposx = 0;
     float endposy = 0;
-    boundings bound;
 
 };
 
 std::vector<shapeinfo> shapes;
-int squares[3][3] = { 0 };
+int squares[3][3] = { {3,3,3}, {3,3,3}, {3,3,3} };
 
 
 //bools
@@ -48,7 +54,7 @@ bool seventhcheck = true;
 bool eighthchcek = true;
 bool ninthcheck = true;
 
-void checkclickanddraw(const sf::Vector2i& mouse_position) {
+void checkclickanddraw(const sf::Vector2i& mouse_position,bool screen_check) {
     // if(mouse_position.x > 25 && mouse_position.x < 225 && mouse_position.y > 75 && mouse_position.y < 275 && sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
     //     sf::RectangleShape temp;
     //     temp.setPosition(50,100);
@@ -56,30 +62,292 @@ void checkclickanddraw(const sf::Vector2i& mouse_position) {
     //     window.draw(temp);
     //     MessageBoxW(NULL,L"Clicked",L"mouseclick",MB_OK);
     // }
-    if (firstsquarecheck(mouse_position) && firstcheck)
+    if (firstsquarecheck(mouse_position) && firstcheck && screen_check)
     {
-        shapeinfo temp;
-        temp.type = CROSS;
-        temp.startposx = 35;
-        temp.startposy = 85;
-        temp.endposx = 210;
-        temp.endposy = 260;
-        temp.bound = {
-            25, 75, 225,275
-        };
-        shapes.push_back(temp);
-        firstcheck = false;
+        if(cross) {
+            shapeinfo temp;
+            temp.type = CROSS;
+            temp.startposx = 35;
+            temp.startposy = 85;
+            temp.endposx = 210;
+            temp.endposy = 260;
+            shapes.push_back(temp);
+            squares[0][0] = 1;
+            firstcheck = false;
+            cross = false;
+        } else {
+            shapeinfo temp;
+            temp.type = CIRCLE;
+            temp.startposx = 35;
+            temp.startposy = 85;
+            shapes.push_back(temp);
+            squares[0][0] = 0;
+            firstcheck = false;
+            cross = true;
+        }
     }
 
-    if (secondsquarecheck(mouse_position))
+    if (secondsquarecheck(mouse_position) && secondcheck && screen_check)
     {
-        MessageBoxW(NULL, L"Clicked2", L"mouseclick2",MB_OK);
+       // MessageBoxW(NULL, L"Clicked2", L"mouseclick2",MB_OK);
+        if(cross) {
+            shapeinfo temp;
+            temp.type = CROSS;
+            temp.startposx = 235;
+            temp.startposy = 85;
+            temp.endposx = 410;
+            temp.endposy = 260;
+            shapes.push_back(temp);
+            squares[0][1] = 1;
+            secondcheck = false;
+            cross = false;
+        } else {
+            shapeinfo temp;
+            temp.type = CIRCLE;
+            temp.startposx = 235;
+            temp.startposy = 85;
+            shapes.push_back(temp);
+            squares[0][1] = 0;
+            secondcheck = false;
+            cross = true;
+        }
     }
 
-    if(forthsquarecheck(mouse_position)) {
-        MessageBoxW(NULL, L"Clicked4", L"mouseclick4",MB_OK);
+    if(thirdsquarecheck(mouse_position) && thirdcheck && screen_check) {
+        if(cross) {
+            shapeinfo temp;
+            temp.type = CROSS;
+            temp.startposx = 435;
+            temp.startposy = 85;
+            temp.endposx = 610;
+            temp.endposy = 260;
+            shapes.push_back(temp);
+            squares[0][2] = 1;
+            thirdcheck = false;
+            cross = false;
+        } else {
+            shapeinfo temp;
+            temp.type = CIRCLE;
+            temp.startposx = 435;
+            temp.startposy = 85;
+            shapes.push_back(temp);
+            squares[0][2] = 0;
+            thirdcheck = false;
+            cross = true;
+        }
+    }
+
+    if(forthsquarecheck(mouse_position) && forthcheck && screen_check) {
+        if(cross) {
+            shapeinfo temp;
+            temp.type = CROSS;
+            temp.startposx = 35;
+            temp.startposy = 285;
+            temp.endposx = 210;
+            temp.endposy = 460;
+            shapes.push_back(temp);
+            squares[1][0] = 1;
+            forthcheck = false;
+            cross = false;
+        } else {
+            shapeinfo temp;
+            temp.type = CIRCLE;
+            temp.startposx = 35;
+            temp.startposy = 285;
+            shapes.push_back(temp);
+            squares[1][0] = 0;
+            forthcheck = false;
+            cross = true;
+        }
+    }
+
+    if(fifthsquarecheck(mouse_position) && fifthcheck && screen_check) {
+        if(cross) {
+            shapeinfo temp;
+            temp.type = CROSS;
+            temp.startposx = 235;
+            temp.startposy = 285;
+            temp.endposx = 410;
+            temp.endposy = 460;
+            shapes.push_back(temp);
+            squares[1][1] = 1;
+            fifthcheck = false;
+            cross = false;
+        } else {
+            shapeinfo temp;
+            temp.type = CIRCLE;
+            temp.startposx = 235;
+            temp.startposy = 285;
+            shapes.push_back(temp);
+            squares[1][1] = 0;
+            fifthcheck = false;
+            cross = true;
+        }
     }
     
+    if(sixthsquarecheck(mouse_position) && sixthcheck && screen_check) {
+        if(cross) {
+            shapeinfo temp;
+            temp.type = CROSS;
+            temp.startposx = 435;
+            temp.startposy = 285;
+            temp.endposx = 610;
+            temp.endposy = 460;
+            shapes.push_back(temp);
+            squares[1][2] = 1;
+            sixthcheck = false;
+            cross = false;
+        } else {
+            shapeinfo temp;
+            temp.type = CIRCLE;
+            temp.startposx = 435;
+            temp.startposy = 285;
+            shapes.push_back(temp);
+            squares[1][2] = 0;
+            sixthcheck = false;
+            cross = true;
+        }
+    }
+
+    if(seventhsquarecheck(mouse_position) && seventhcheck && screen_check) {
+        if(cross) {
+            shapeinfo temp;
+            temp.type = CROSS;
+            temp.startposx = 35;
+            temp.startposy = 485;
+            temp.endposx = 210;
+            temp.endposy = 660;
+            shapes.push_back(temp);
+            squares[2][0] = 1;
+            seventhcheck = false;
+            cross = false;
+        } else {
+            shapeinfo temp;
+            temp.type = CIRCLE;
+            temp.startposx = 35;
+            temp.startposy = 485;
+            shapes.push_back(temp);
+            squares[2][0] = 0;
+            seventhcheck = false;
+            cross = true;
+        }
+    }
+
+    if(eighthsquarecheck(mouse_position) && eighthchcek && screen_check) {
+        if(cross) {
+            shapeinfo temp;
+            temp.type = CROSS;
+            temp.startposx = 235;
+            temp.startposy = 485;
+            temp.endposx = 410;
+            temp.endposy = 660;
+            shapes.push_back(temp);
+            squares[2][1] = 1;
+            eighthchcek = false;
+            cross = false;
+        } else {
+            shapeinfo temp;
+            temp.type = CIRCLE;
+            temp.startposx = 235;
+            temp.startposy = 485;
+            shapes.push_back(temp);
+            squares[2][1] = 0;
+            eighthchcek = false;
+            cross = true;
+        }
+    }
+
+    if(ninethsquarecheck(mouse_position) && ninthcheck && screen_check) {
+        if(cross) {
+            shapeinfo temp;
+            temp.type = CROSS;
+            temp.startposx = 435;
+            temp.startposy = 485;
+            temp.endposx = 610;
+            temp.endposy = 660;
+            shapes.push_back(temp);
+            squares[2][2] = 1;
+            ninthcheck = false;
+            cross = false;
+        } else {
+            shapeinfo temp;
+            temp.type = CIRCLE;
+            temp.startposx = 435;
+            temp.startposy = 485;
+            shapes.push_back(temp);
+            squares[2][2] = 0;
+            ninthcheck = false;
+            cross = true;
+        }
+    }
+}
+
+//if return 1 = x win; if return 0 = circle win; if return anything else: draw;
+int DoesXwinOrCircleWin() {
+    if(squares[0][0] == 1 && squares[0][1] == 1 && squares[0][2] == 1) {
+        return 1;
+    }
+
+    if(squares[0][0] == 0 && squares[0][1] == 0 && squares[0][2] == 0) {
+        return 0;
+    }
+
+    if(squares[1][0] == 1 && squares[1][1] == 1 && squares[1][2] == 1) {
+        return 1;
+    }
+
+    if(squares[1][0] == 0 && squares[1][1] == 0 && squares[1][2] == 0) {
+        return 0;
+    }
+
+    if(squares[2][0] == 1 && squares[2][1] == 1 && squares[2][2] == 1) {
+        return 1;
+    }
+
+    if(squares[2][0] == 0 && squares[2][1] == 0 && squares[2][2] == 0) {
+        return 0;
+    }
+
+    if(squares[0][0] == 1 && squares[1][0] == 1 && squares[2][0] == 1) {
+        return 1;
+    }
+
+    if(squares[0][0] == 0 && squares[1][0] == 0 && squares[2][0] == 0) {
+        return 0;
+    }
+
+    if(squares[0][1] == 1 && squares[1][1] == 1 && squares[2][1] == 1) {
+        return 1;
+    }
+
+    if(squares[0][1] == 0 && squares[1][1] == 0 && squares[2][1] == 0) {
+        return 0;
+    }
+
+    if(squares[0][2] == 1 && squares[1][2] == 1 && squares[2][2] == 1) {
+        return 1;
+    }
+
+    if(squares[0][2] == 0 && squares[1][2] == 0 && squares[2][2] == 0) {
+        return 0;
+    }
+
+    if(squares[0][0] == 1 && squares[1][1] == 1 && squares[2][2] == 1) {
+        return 1;
+    }
+
+    if(squares[0][0] == 0 && squares[1][1] == 0 && squares[2][2] == 0) {
+        return 0;
+    }
+
+    if(squares[0][2] == 1 && squares[1][1] == 1 && squares[2][0] == 1) {
+        return 1;
+    }
+
+    if(squares[0][2] == 0 && squares[1][1] == 0 && squares[2][0] == 0) {
+        return 0;
+    }
+    return 2;
 }
 
 void testfunction(sf::RenderWindow& window) {
@@ -115,7 +383,7 @@ int main()
     text.setFillColor(sf::Color::Yellow);
     text2.setFont(font);
     text2.setFillColor(sf::Color::Yellow);
-    auto window = sf::RenderWindow{ { WINDOW_WIDTH, WINDOW_HEIGHT }, "CMake SFML Project",sf::Style::Close };
+    auto window = sf::RenderWindow{ { WINDOW_WIDTH, WINDOW_HEIGHT }, L"တစ်တက်တိုး",sf::Style::Close };
     window.setFramerateLimit(144);
     window.setPosition(sf::Vector2i(1366/2 - WINDOW_WIDTH/2 ,0));
     // define a 120x50 rectangle
@@ -151,7 +419,7 @@ int main()
         rectangels[j].setFillColor(sf::Color::Black);
     }
 
-    
+    int winn = winnertags::x;
     while (window.isOpen())
     {
         for (auto event = sf::Event{}; window.pollEvent(event);)
@@ -199,7 +467,7 @@ int main()
                 window.draw(rectangels[i]);
             }
             testfunction(window);
-            checkclickanddraw(sf::Mouse::getPosition(window));
+            checkclickanddraw(sf::Mouse::getPosition(window), gamemode);
             for(auto& e : shapes) {
                 
                 if(e.type == CROSS) {
@@ -218,8 +486,43 @@ int main()
                     line[3].color = sf::Color::Green;
                     window.draw(line);
                 }
+
+                if (e.type == CIRCLE) {
+                    sf::CircleShape circle(88.f);
+                    circle.setPosition(e.startposx,e.startposy);
+                    circle.setFillColor(sf::Color(0x00,0x00,0x00,0xff));
+                    circle.setOutlineThickness(4);
+                    circle.setOutlineColor(sf::Color(0x00,0xff,0x00,0xff));
+                    window.draw(circle);
+                }
                 
             }
+            if( DoesXwinOrCircleWin() == 1) {
+                winnerscreen = true;
+                gamemode = false;
+                winn = x;
+            }else if( DoesXwinOrCircleWin() == 0){
+                winnerscreen = true;
+                gamemode = false;
+                winn = circle;
+            } else if(DoesXwinOrCircleWin() == 2) {
+                winnerscreen = true;
+                gamemode = false;
+                winn = draw;
+            }
+        }
+
+        if(winnerscreen) {
+            if(winn == winnertags::x) {
+                text.setString(L"X win");
+                
+            } else if(winn == winnertags::circle){
+                text.setString(L"O Win");
+            } else if(winn == winnertags::draw){
+                text.setString(L"Both Draw");
+            }
+            window.clear();
+            window.draw(text);
         }
         window.display();
     }
