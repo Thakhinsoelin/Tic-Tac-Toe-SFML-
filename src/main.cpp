@@ -1,11 +1,7 @@
 #include <SFML/Graphics.hpp>
-#include <SFML/Graphics/CircleShape.hpp>
-#include <SFML/Graphics/Color.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
-#include <SFML/System/Vector2.hpp>
 #include "checksquares.cpp"
-#include <SFML/Window/WindowStyle.hpp>
 #include <vector>
+#include <thread>
 #define WINDOW_WIDTH 650
 
 
@@ -39,8 +35,14 @@ struct shapeinfo {
 
 };
 
+struct checkstruct {
+    bool xwin = false;
+    bool ywin = false;
+    bool draw = false;
+};
+
 std::vector<shapeinfo> shapes;
-int squares[3][3] = { {3,3,3}, {3,3,3}, {3,3,3} };
+int squares[3][3] ;
 
 
 //bools
@@ -53,8 +55,13 @@ bool sixthcheck = true;
 bool seventhcheck = true;
 bool eighthchcek = true;
 bool ninthcheck = true;
+bool thread_wait = true;
 
-void checkclickanddraw(const sf::Vector2i& mouse_position,bool screen_check) {
+void checkclickanddraw(const sf::Vector2i& mouse_position) {
+    if(thread_wait) {
+        _sleep(150);
+        thread_wait = false;
+    }
     // if(mouse_position.x > 25 && mouse_position.x < 225 && mouse_position.y > 75 && mouse_position.y < 275 && sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
     //     sf::RectangleShape temp;
     //     temp.setPosition(50,100);
@@ -62,7 +69,7 @@ void checkclickanddraw(const sf::Vector2i& mouse_position,bool screen_check) {
     //     window.draw(temp);
     //     MessageBoxW(NULL,L"Clicked",L"mouseclick",MB_OK);
     // }
-    if (firstsquarecheck(mouse_position) && firstcheck && screen_check)
+    if (firstsquarecheck(mouse_position) && firstcheck )
     {
         if(cross) {
             shapeinfo temp;
@@ -87,7 +94,7 @@ void checkclickanddraw(const sf::Vector2i& mouse_position,bool screen_check) {
         }
     }
 
-    if (secondsquarecheck(mouse_position) && secondcheck && screen_check)
+    if (secondsquarecheck(mouse_position) && secondcheck )
     {
        // MessageBoxW(NULL, L"Clicked2", L"mouseclick2",MB_OK);
         if(cross) {
@@ -113,7 +120,7 @@ void checkclickanddraw(const sf::Vector2i& mouse_position,bool screen_check) {
         }
     }
 
-    if(thirdsquarecheck(mouse_position) && thirdcheck && screen_check) {
+    if(thirdsquarecheck(mouse_position) && thirdcheck ) {
         if(cross) {
             shapeinfo temp;
             temp.type = CROSS;
@@ -137,7 +144,7 @@ void checkclickanddraw(const sf::Vector2i& mouse_position,bool screen_check) {
         }
     }
 
-    if(forthsquarecheck(mouse_position) && forthcheck && screen_check) {
+    if(forthsquarecheck(mouse_position) && forthcheck ) {
         if(cross) {
             shapeinfo temp;
             temp.type = CROSS;
@@ -161,7 +168,7 @@ void checkclickanddraw(const sf::Vector2i& mouse_position,bool screen_check) {
         }
     }
 
-    if(fifthsquarecheck(mouse_position) && fifthcheck && screen_check) {
+    if(fifthsquarecheck(mouse_position) && fifthcheck ) {
         if(cross) {
             shapeinfo temp;
             temp.type = CROSS;
@@ -185,7 +192,7 @@ void checkclickanddraw(const sf::Vector2i& mouse_position,bool screen_check) {
         }
     }
     
-    if(sixthsquarecheck(mouse_position) && sixthcheck && screen_check) {
+    if(sixthsquarecheck(mouse_position) && sixthcheck ) {
         if(cross) {
             shapeinfo temp;
             temp.type = CROSS;
@@ -209,7 +216,7 @@ void checkclickanddraw(const sf::Vector2i& mouse_position,bool screen_check) {
         }
     }
 
-    if(seventhsquarecheck(mouse_position) && seventhcheck && screen_check) {
+    if(seventhsquarecheck(mouse_position) && seventhcheck ) {
         if(cross) {
             shapeinfo temp;
             temp.type = CROSS;
@@ -233,7 +240,7 @@ void checkclickanddraw(const sf::Vector2i& mouse_position,bool screen_check) {
         }
     }
 
-    if(eighthsquarecheck(mouse_position) && eighthchcek && screen_check) {
+    if(eighthsquarecheck(mouse_position) && eighthchcek ) {
         if(cross) {
             shapeinfo temp;
             temp.type = CROSS;
@@ -257,7 +264,7 @@ void checkclickanddraw(const sf::Vector2i& mouse_position,bool screen_check) {
         }
     }
 
-    if(ninethsquarecheck(mouse_position) && ninthcheck && screen_check) {
+    if(ninethsquarecheck(mouse_position) && ninthcheck ) {
         if(cross) {
             shapeinfo temp;
             temp.type = CROSS;
@@ -282,81 +289,125 @@ void checkclickanddraw(const sf::Vector2i& mouse_position,bool screen_check) {
     }
 }
 
+bool restartbuttoncheck(const sf::Vector2i& mouse_position,const sf::Vector2f& rect_pos, const sf::Vector2f& rect_size) {
+    bool inside = true;
+    bool click = false;
+    // printf("mouse_x: %i, mouse_y: %i\n",mouse_position.x, mouse_position.y);
+    if (mouse_position.x < rect_pos.x ) {
+        inside = false;
+    } else if (mouse_position.x > rect_pos.x + rect_size.x) {
+        inside = false;
+    } else if (mouse_position.y < rect_pos.y) {
+        inside = false;
+    } else if (mouse_position.y > rect_pos.y + rect_size.y) {
+        inside = false;
+    } else {
+        inside = true;
+    }
+
+    if(inside == true && sf::Mouse::isButtonPressed(sf::Mouse::Left) == true) {
+        click = true;
+    }
+    return click;
+}
+
+bool isBoardFull() {
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+        if (squares[i][j] == 4) {
+                return false;    // Empty square found, so board is not full
+            }
+        }
+    }
+    return true;
+}
 //if return 1 = x win; if return 0 = circle win; if return anything else: draw;
 int DoesXwinOrCircleWin() {
+    
+    bool winnerexist = false;
     if(squares[0][0] == 1 && squares[0][1] == 1 && squares[0][2] == 1) {
+        winnerexist = true;
         return 1;
     }
 
-    if(squares[0][0] == 0 && squares[0][1] == 0 && squares[0][2] == 0) {
+    else if(squares[0][0] == 0 && squares[0][1] == 0 && squares[0][2] == 0) {
+        winnerexist = true;
         return 0;
     }
 
     if(squares[1][0] == 1 && squares[1][1] == 1 && squares[1][2] == 1) {
+        winnerexist = true;
         return 1;
     }
 
     if(squares[1][0] == 0 && squares[1][1] == 0 && squares[1][2] == 0) {
+        winnerexist = true;
         return 0;
     }
 
     if(squares[2][0] == 1 && squares[2][1] == 1 && squares[2][2] == 1) {
+        winnerexist = true;
         return 1;
     }
 
     if(squares[2][0] == 0 && squares[2][1] == 0 && squares[2][2] == 0) {
+        winnerexist = true;
         return 0;
     }
 
     if(squares[0][0] == 1 && squares[1][0] == 1 && squares[2][0] == 1) {
+        winnerexist = true;
         return 1;
     }
 
     if(squares[0][0] == 0 && squares[1][0] == 0 && squares[2][0] == 0) {
+        winnerexist = true;
         return 0;
     }
 
     if(squares[0][1] == 1 && squares[1][1] == 1 && squares[2][1] == 1) {
+        winnerexist = true;
         return 1;
     }
 
     if(squares[0][1] == 0 && squares[1][1] == 0 && squares[2][1] == 0) {
+        winnerexist = true;
         return 0;
     }
 
     if(squares[0][2] == 1 && squares[1][2] == 1 && squares[2][2] == 1) {
+        winnerexist = true;
         return 1;
     }
 
     if(squares[0][2] == 0 && squares[1][2] == 0 && squares[2][2] == 0) {
+        winnerexist = true;
         return 0;
     }
 
+    /*this is a comment*/
+
     if(squares[0][0] == 1 && squares[1][1] == 1 && squares[2][2] == 1) {
+        winnerexist = true;
         return 1;
     }
 
     if(squares[0][0] == 0 && squares[1][1] == 0 && squares[2][2] == 0) {
+        winnerexist = true;
         return 0;
     }
 
     if(squares[0][2] == 1 && squares[1][1] == 1 && squares[2][0] == 1) {
+        winnerexist = true;
         return 1;
     }
 
     if(squares[0][2] == 0 && squares[1][1] == 0 && squares[2][0] == 0) {
+        winnerexist = true;
         return 0;
     }
     return 2;
 }
-
-void testfunction(sf::RenderWindow& window) {
-    sf::RectangleShape temp;
-        temp.setPosition(50,100);
-        temp.setFillColor(sf::Color(0xff,0x00,0x00,0xff));
-        window.draw(temp);
-}
-
 bool checkwincondition() {
     return true;
 }
@@ -370,11 +421,18 @@ int main()
     bool welcomescreen = true;
     bool gamemode = false;
     bool winnerscreen = false;
+    bool winnercheck = false;
     int winner = 0;
     sf::Font font;
     bool running = true;
     if(!font.loadFromFile("Pyidaungsu.ttf")) {
         printf("Font loading failed\n");
+    }
+
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            squares[i][j] = 4;
+        }
     }
     
     sf::Text text;
@@ -383,7 +441,7 @@ int main()
     text.setFillColor(sf::Color::Yellow);
     text2.setFont(font);
     text2.setFillColor(sf::Color::Yellow);
-    auto window = sf::RenderWindow{ { WINDOW_WIDTH, WINDOW_HEIGHT }, L"တစ်တက်တိုး",sf::Style::Close };
+    auto window = sf::RenderWindow{ { WINDOW_WIDTH, WINDOW_HEIGHT }, L"Tic Tac Toe",sf::Style::Close };
     window.setFramerateLimit(144);
     window.setPosition(sf::Vector2i(1366/2 - WINDOW_WIDTH/2 ,0));
     // define a 120x50 rectangle
@@ -436,6 +494,7 @@ int main()
                 if(event.key.code == sf::Keyboard::S) {
                     gamemode = true;
                     welcomescreen = false;
+                    winnerscreen = false;
                 }
             }
         }
@@ -463,11 +522,15 @@ int main()
 
         }
         if(gamemode) {
+            
+            printf("Currently in gamemode\n");
+            window.clear(sf::Color(0x00,0x00,0x00,0xff));
             for (int i = 0; i < 9; ++i) {
                 window.draw(rectangels[i]);
             }
-            testfunction(window);
-            checkclickanddraw(sf::Mouse::getPosition(window), gamemode);
+            std::thread another_thread(checkclickanddraw,sf::Mouse::getPosition(window));
+            another_thread.join();
+            checkclickanddraw(sf::Mouse::getPosition(window));
             for(auto& e : shapes) {
                 
                 if(e.type == CROSS) {
@@ -497,22 +560,30 @@ int main()
                 }
                 
             }
-            if( DoesXwinOrCircleWin() == 1) {
-                winnerscreen = true;
-                gamemode = false;
-                winn = x;
-            }else if( DoesXwinOrCircleWin() == 0){
-                winnerscreen = true;
-                gamemode = false;
-                winn = circle;
-            } else if(DoesXwinOrCircleWin() == 2) {
+            printf("\"%i\", \"%i\", \"%i\"\n", squares[0][0],squares[0][1],squares[0][2]);
+            printf("\"%i\", \"%i\", \"%i\"\n", squares[1][0],squares[1][1],squares[1][2]);
+            printf("\"%i\", \"%i\", \"%i\"\n", squares[2][0],squares[2][1],squares[2][2]);
+            printf("\n");
+
+            int result = DoesXwinOrCircleWin();
+            if(isBoardFull()) {
                 winnerscreen = true;
                 gamemode = false;
                 winn = draw;
             }
+            if( result == 1) {
+                winnerscreen = true;
+                gamemode = false;
+                winn = x;
+            }else if( result == 0){
+                winnerscreen = true;
+                gamemode = false;
+                winn = circle;
+            } 
         }
 
         if(winnerscreen) {
+            // printf("currently in winnerscreen\n");cla
             if(winn == winnertags::x) {
                 text.setString(L"X win");
                 
@@ -521,8 +592,49 @@ int main()
             } else if(winn == winnertags::draw){
                 text.setString(L"Both Draw");
             }
+            text2.setString("Restart");
+            text2.setCharacterSize(75);
+            int text_width = text.getLocalBounds().width;
+            int text_height = text.getLocalBounds().height;
+
+            int text2_width = text2.getLocalBounds().width;
+            int text2_height = text2.getLocalBounds().height;
+            text.setPosition(window.getSize().x / 2 - text_width / 2,50);
+            text2.setPosition(window.getSize().x / 2 - text2_width / 2, 250 + text_height);
+            sf::RectangleShape restart(sf::Vector2f(text2.getLocalBounds().width, text2.getLocalBounds().height));
+            restart.setFillColor(sf::Color::Green);
+            restart.setPosition(text2.getPosition().x, text2.getPosition().y + 20);
+            restart.setOutlineThickness(3);
+            restart.setOutlineColor(sf::Color::Red);
+
             window.clear();
             window.draw(text);
+            window.draw(restart);
+            window.draw(text2);
+
+            if (restartbuttoncheck(sf::Mouse::getPosition(window),restart.getPosition(),restart.getSize()))
+            {
+                gamemode = true;
+                winnerscreen = false;
+                welcomescreen = false;
+                 firstcheck = true;
+                secondcheck = true;
+                 thirdcheck = true;
+                 forthcheck = true;
+                 fifthcheck = true;
+                 sixthcheck = true;
+                 seventhcheck = true;
+                 eighthchcek = true;
+                 ninthcheck = true;
+                 thread_wait = true;
+                shapes.clear();
+                for (int i = 0; i < 3; i++) {
+                    for (int j = 0; j < 3; j++) {
+                        squares[i][j] = 4;
+                    }
+                }
+            }
+            
         }
         window.display();
     }
