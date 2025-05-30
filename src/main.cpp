@@ -6,6 +6,7 @@
 #include "checksquares.cpp"
 #include <SFML/Window/WindowStyle.hpp>
 #include <vector>
+#include <iostream>
 #define WINDOW_WIDTH 650
 
 
@@ -347,7 +348,34 @@ int DoesXwinOrCircleWin() {
     if(squares[0][2] == 0 && squares[1][1] == 0 && squares[2][0] == 0) {
         return 0;
     }
-    return 2;
+
+    if (squares[0][0] != 3 && squares[0][1] != 3 && squares[0][2] != 3 &&
+        squares[1][0] != 3 && squares[1][1] != 3 && squares[1][2] != 3 &&
+        squares[2][0] != 3 && squares[2][1] != 3 && squares[2][2] != 3) {
+        return 2;
+    }
+
+    bool boardIsFull = true; // Assume it's full until we find an empty spot
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            if (squares[i][j] == 3) { // If we find a '3', it means the cell is empty
+                boardIsFull = false; // The board is NOT full
+                break; // No need to check further in this row
+            }
+        }
+        if (!boardIsFull) {
+            break; // No need to check further rows if an empty cell was found
+        }
+    }
+    std::cout << std::boolalpha;
+    std::cout << "is board full: " << boardIsFull << "\n";
+
+    //// After checking all cells:
+    //if (boardIsFull) {
+    //    // If boardIsFull is true, and we've already checked for wins (and found none),
+    //    // then it must be a draw.
+    //    return 2; // Using anything except 1 or 0 for draw.
+    //}
 }
 
 void testfunction(sf::RenderWindow& window) {
@@ -383,7 +411,7 @@ int main()
     text.setFillColor(sf::Color::Yellow);
     text2.setFont(font);
     text2.setFillColor(sf::Color::Yellow);
-    auto window = sf::RenderWindow{ { WINDOW_WIDTH, WINDOW_HEIGHT }, L"တစ်တက်တိုး",sf::Style::Close };
+    auto window = sf::RenderWindow{ { WINDOW_WIDTH, WINDOW_HEIGHT }, "တစ်တက်တိုး",sf::Style::Close };
     window.setFramerateLimit(144);
     window.setPosition(sf::Vector2i(1366/2 - WINDOW_WIDTH/2 ,0));
     // define a 120x50 rectangle
@@ -466,7 +494,6 @@ int main()
             for (int i = 0; i < 9; ++i) {
                 window.draw(rectangels[i]);
             }
-            testfunction(window);
             checkclickanddraw(sf::Mouse::getPosition(window), gamemode);
             for(auto& e : shapes) {
                 
@@ -513,6 +540,7 @@ int main()
         }
 
         if(winnerscreen) {
+            
             if(winn == winnertags::x) {
                 text.setString(L"X win");
                 
@@ -521,6 +549,9 @@ int main()
             } else if(winn == winnertags::draw){
                 text.setString(L"Both Draw");
             }
+            int text_width = text.getLocalBounds().width;
+            int text_height = text.getLocalBounds().height;
+            text.setPosition(window.getSize().x / 2 - text_width / 2, window.getSize().y / 2 - text_height / 2);
             window.clear();
             window.draw(text);
         }
