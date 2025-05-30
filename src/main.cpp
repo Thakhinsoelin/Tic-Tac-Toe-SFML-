@@ -55,6 +55,15 @@ bool seventhcheck = true;
 bool eighthchcek = true;
 bool ninthcheck = true;
 
+// return true if it is even and false if it is odd
+bool isEven(int num) {
+    if (num % 2 == 0) {
+        return true;
+    }
+    return false;
+}
+
+
 void checkclickanddraw(const sf::Vector2i& mouse_position,bool screen_check) {
     // if(mouse_position.x > 25 && mouse_position.x < 225 && mouse_position.y > 75 && mouse_position.y < 275 && sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
     //     sf::RectangleShape temp;
@@ -355,20 +364,22 @@ int DoesXwinOrCircleWin() {
         return 2;
     }
 
-    bool boardIsFull = true; // Assume it's full until we find an empty spot
-    for (int i = 0; i < 3; ++i) {
-        for (int j = 0; j < 3; ++j) {
-            if (squares[i][j] == 3) { // If we find a '3', it means the cell is empty
-                boardIsFull = false; // The board is NOT full
-                break; // No need to check further in this row
-            }
-        }
-        if (!boardIsFull) {
-            break; // No need to check further rows if an empty cell was found
-        }
-    }
-    std::cout << std::boolalpha;
-    std::cout << "is board full: " << boardIsFull << "\n";
+    return 3;
+
+    //bool boardIsFull = true; // Assume it's full until we find an empty spot
+    //for (int i = 0; i < 3; ++i) {
+    //    for (int j = 0; j < 3; ++j) {
+    //        if (squares[i][j] == 3) { // If we find a '3', it means the cell is empty
+    //            boardIsFull = false; // The board is NOT full
+    //            break; // No need to check further in this row
+    //        }
+    //    }
+    //    if (!boardIsFull) {
+    //        break; // No need to check further rows if an empty cell was found
+    //    }
+    //}
+    //std::cout << std::boolalpha;
+    //std::cout << "is board full: " << boardIsFull << "\n";
 
     //// After checking all cells:
     //if (boardIsFull) {
@@ -411,8 +422,11 @@ int main()
     text.setFillColor(sf::Color::Yellow);
     text2.setFont(font);
     text2.setFillColor(sf::Color::Yellow);
+    sf::Text textforturn;
+    textforturn.setFont(font);
+    textforturn.setFillColor(sf::Color::Yellow);
     auto window = sf::RenderWindow{ { WINDOW_WIDTH, WINDOW_HEIGHT }, "တစ်တက်တိုး",sf::Style::Close };
-    window.setFramerateLimit(144);
+    window.setFramerateLimit(30);
     window.setPosition(sf::Vector2i(1366/2 - WINDOW_WIDTH/2 ,0));
     // define a 120x50 rectangle
     sf::RectangleShape rectangels[9] = {sf::RectangleShape(sf::Vector2f(200.f,200.f)),
@@ -490,14 +504,34 @@ int main()
             window.draw(text2);
 
         }
-        if(gamemode) {
+        if (gamemode) {
+            
+            if (isEven(shapes.size())) {
+                textforturn.setString("X turn\n");
+                textforturn.setCharacterSize(50);
+                textforturn.setOutlineThickness(5);
+                textforturn.setOutlineColor(sf::Color::Red);
+                int text_width = textforturn.getLocalBounds().width;
+                textforturn.setPosition(window.getSize().x / 2 - text_width / 2, 3);
+                window.draw(textforturn);
+            }
+            else {
+                textforturn.setString("Y turn\n");
+                textforturn.setCharacterSize(50);
+                textforturn.setOutlineThickness(5);
+                textforturn.setOutlineColor(sf::Color::Red);
+                int text_width = textforturn.getLocalBounds().width;
+                textforturn.setPosition(window.getSize().x / 2 - text_width / 2, 3);
+                window.draw(textforturn);
+            };
             for (int i = 0; i < 9; ++i) {
                 window.draw(rectangels[i]);
             }
             checkclickanddraw(sf::Mouse::getPosition(window), gamemode);
-            for(auto& e : shapes) {
-                
-                if(e.type == CROSS) {
+            
+            for (auto& e : shapes) {
+
+                if (e.type == CROSS) {
                     sf::VertexArray line(sf::Lines, 4);
 
                     line[0].position = sf::Vector2f(e.startposx, e.startposy);  // Starting point
@@ -506,36 +540,40 @@ int main()
                     line[1].position = sf::Vector2f(e.endposx, e.endposy);  // Ending point
                     line[1].color = sf::Color::Green;
 
-                    line[2].position = sf::Vector2f(e.startposx + 200 - 25, e.startposy );  // Starting point
+                    line[2].position = sf::Vector2f(e.startposx + 200 - 25, e.startposy);  // Starting point
                     line[2].color = sf::Color::Green;
 
-                    line[3].position = sf::Vector2f( e.startposx , e.endposy);  // Ending point
+                    line[3].position = sf::Vector2f(e.startposx, e.endposy);  // Ending point
                     line[3].color = sf::Color::Green;
                     window.draw(line);
                 }
 
                 if (e.type == CIRCLE) {
                     sf::CircleShape circle(88.f);
-                    circle.setPosition(e.startposx,e.startposy);
-                    circle.setFillColor(sf::Color(0x00,0x00,0x00,0xff));
+                    circle.setPosition(e.startposx, e.startposy);
+                    circle.setFillColor(sf::Color(0x00, 0x00, 0x00, 0xff));
                     circle.setOutlineThickness(4);
-                    circle.setOutlineColor(sf::Color(0x00,0xff,0x00,0xff));
+                    circle.setOutlineColor(sf::Color(0x00, 0xff, 0x00, 0xff));
                     window.draw(circle);
                 }
-                
+
             }
-            if( DoesXwinOrCircleWin() == 1) {
+            if (DoesXwinOrCircleWin() == 1) {
                 winnerscreen = true;
                 gamemode = false;
                 winn = x;
-            }else if( DoesXwinOrCircleWin() == 0){
+            }
+            else if (DoesXwinOrCircleWin() == 0) {
                 winnerscreen = true;
                 gamemode = false;
                 winn = circle;
-            } else if(DoesXwinOrCircleWin() == 2) {
+            }
+            else if (DoesXwinOrCircleWin() == 2) {
                 winnerscreen = true;
                 gamemode = false;
                 winn = draw;
+            }
+            else if (DoesXwinOrCircleWin() == 3) {
             }
         }
 
