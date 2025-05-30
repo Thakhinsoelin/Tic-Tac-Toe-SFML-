@@ -11,7 +11,7 @@ FetchContent_Declare(SFML
 FetchContent_MakeAvailable(SFML)
 
 add_executable(TicTacToe src/main.cpp)
-target_link_libraries(TicTacToe PRIVATE sfml-graphics)
+target_link_libraries(TicTacToe PRIVATE sfml-window sfml-graphics sfml-system)
 target_compile_features(TicTacToe PRIVATE cxx_std_17)
 
 add_executable(test src/test.cpp)
